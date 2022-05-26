@@ -1,0 +1,9 @@
+.DS_Store
+build/
+bin/
+main
+*.out
+*.png
+*.ttf
+assets/font/
+assets/images/

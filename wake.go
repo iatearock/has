@@ -42,6 +42,7 @@ func (b *Bubble) Draw(screen, bb *ebiten.Image) {
 	sx := 1.0 / 100.0 * b.size
 	op.GeoM.Scale(sx, sx)
 	op.GeoM.Translate(b.pos.X, b.pos.Y)
+	op.GeoM = game.cam.Concat(op.GeoM)
 	op.ColorM.Scale(1, 1, 1, b.alpha/127.0)
 	screen.DrawImage(bb, op)
 }

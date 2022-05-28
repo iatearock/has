@@ -27,13 +27,17 @@ func (s *SceneGame) Update() error {
 		s.sceneManager.GoTo(&SceneTitle{s.sceneManager})
 	}
 	game.wake.Update()
-	s.direction.SetPosition(game.b.body.Position())
+	bp := game.b.body.Position()
+	s.direction.SetPosition(bp)
+
+	game.cam.Position = [2]float64{bp.X, bp.Y}
 	return nil
 }
 
 func (s *SceneGame) Draw(screen *ebiten.Image) {
 	screen.Fill(color.RGBA{128, 170, 187, 255})
 
+	game.cam.Update()
 	text.Draw(screen, "Press q to return to Title Screen", font24, 50, screenHeight/8*7, color.White)
 	game.island.Draw(screen)
 	game.start.Draw(screen)

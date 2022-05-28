@@ -73,6 +73,7 @@ func (b *Boat) Draw(screen *ebiten.Image) {
 	op.GeoM.Translate(-float64(b.imageW/2), -float64(b.imageH/2))
 	op.GeoM.Rotate(b.body.Angle())
 	op.GeoM.Translate(pos.X, pos.Y)
+	op.GeoM = game.cam.Concat(op.GeoM)
 	screen.DrawImage(b.hull, op)
 	// rudder
 	op.GeoM.Reset()
@@ -81,6 +82,7 @@ func (b *Boat) Draw(screen *ebiten.Image) {
 	op.GeoM.Translate(-float64(b.imageW/2), 0)
 	op.GeoM.Rotate(b.body.Angle())
 	op.GeoM.Translate(pos.X, pos.Y)
+	op.GeoM = game.cam.Concat(op.GeoM)
 	screen.DrawImage(b.rudder, op)
 	// sail
 	op.GeoM.Reset()
@@ -89,6 +91,7 @@ func (b *Boat) Draw(screen *ebiten.Image) {
 	op.GeoM.Translate(float64(b.imageW/4), 0)
 	op.GeoM.Rotate(b.body.Angle())
 	op.GeoM.Translate(pos.X, pos.Y)
+	op.GeoM = game.cam.Concat(op.GeoM)
 	screen.DrawImage(b.sail, op)
 
 	// text.Draw(screen, fmt.Sprintf("Sail %d%% Up", int(b.sailUp*100)), font24, 10, 40, color.White)

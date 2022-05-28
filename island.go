@@ -47,6 +47,7 @@ func (i *Island) Draw(screen *ebiten.Image) {
 	op.GeoM.Translate(-i.radius, -i.radius)
 	op.GeoM.Scale(sx, sy)
 	op.GeoM.Translate(pos.X, pos.Y)
+	op.GeoM = game.cam.Concat(op.GeoM)
 	screen.DrawImage(i.img, op)
 }
 

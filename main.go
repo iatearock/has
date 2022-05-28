@@ -30,7 +30,7 @@ var (
 )
 
 type Game struct {
-	cam          *dango.Camera
+	cam          *Camera
 	b            *Boat
 	island       *Island
 	start        *Island
@@ -47,8 +47,10 @@ func NewGame() *Game {
 		wake:         NewWake(),
 		boatOnIsland: map[*Boat]*Island{},
 	}
-	g.cam = &dango.Camera{}
+	g.cam = &Camera{}
 	g.cam.Reset()
+	g.cam.ViewPort = [2]float64{screenWidth, screenHeight}
+	g.cam.Position = [2]float64{20, 200}
 	return g
 }
 

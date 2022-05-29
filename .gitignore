@@ -5,5 +5,7 @@ main
 *.out
 *.png
 *.ttf
+*.ogg
 assets/font/
+assets/audio/
 assets/images/

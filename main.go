@@ -31,6 +31,7 @@ var (
 
 type Game struct {
 	cam          *Camera
+	audioManager *AudioManager
 	b            *Boat
 	island       *Island
 	start        *Island
@@ -51,6 +52,12 @@ func NewGame() *Game {
 	g.cam.Reset()
 	g.cam.ViewPort = [2]float64{screenWidth, screenHeight}
 	g.cam.Position = [2]float64{20, 200}
+	// var err error
+	// g.audioManager, err = NewAudioPlayer(audio.NewContext(44100)) // sample rate
+	g.audioManager = NewAudioManager()
+	// if err != nil {
+	// 	log.Printf("Cannot start audio player, %s\n", err)
+	// }
 	return g
 }
 

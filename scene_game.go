@@ -17,14 +17,21 @@ func NewSceneGame(sm *SceneManager) *SceneGame {
 	s := &SceneGame{sceneManager: sm}
 	dirImg, _ := vfs.GetImage("assets/images/direction.png")
 	s.direction = ui.NewDirection(dirImg, 600, 40, game.end.body.Position())
+	// game.audioManager.audioPlayer.Play()
+	wave, _ := game.audioManager.NewInfiniteLoop("wave", "assets/audio/632517__thedutchmancreative__waves.ogg")
+	seagull, _ := game.audioManager.NewPlayer("seagull", "assets/audio/510917__lydmakeren__seagulls-short.ogg")
+	wave.Play()
+	seagull.Play()
 	return s
 }
 
 func (s *SceneGame) Update() error {
 	game.b.Update()
+	// game.audioManager.Update()
 	space.Step(1.0 / 60.0)
 	if ebiten.IsKeyPressed(ebiten.KeyQ) {
 		s.sceneManager.GoTo(&SceneTitle{s.sceneManager})
+		game.audioManager.CloseAll()
 	}
 	game.wake.Update()
 	bp := game.b.body.Position()

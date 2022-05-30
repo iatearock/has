@@ -98,7 +98,7 @@ func (b *Boat) Draw(screen *ebiten.Image) {
 }
 
 func (b *Boat) Update() error {
-	b.ControlRow()
+	// b.ControlRow()
 	// b.ControlWind()
 
 	// Lateral resistance

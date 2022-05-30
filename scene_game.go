@@ -11,6 +11,7 @@ import (
 type SceneGame struct {
 	sceneManager *SceneManager
 	direction    *ui.Direction
+	inputHandler *InputHandler
 }
 
 func NewSceneGame(sm *SceneManager) *SceneGame {
@@ -22,21 +23,24 @@ func NewSceneGame(sm *SceneManager) *SceneGame {
 	seagull, _ := game.audioManager.NewPlayer("seagull", "assets/audio/510917__lydmakeren__seagulls-short.ogg")
 	wave.Play()
 	seagull.Play()
+	s.inputHandler = NewDefaultInputHandler(game.b)
 	return s
 }
 
 func (s *SceneGame) Update() error {
+	s.inputHandler.Update()
 	game.b.Update()
-	// game.audioManager.Update()
 	space.Step(1.0 / 60.0)
+
 	if ebiten.IsKeyPressed(ebiten.KeyQ) {
 		s.sceneManager.GoTo(&SceneTitle{s.sceneManager})
 		game.audioManager.CloseAll()
 	}
 	game.wake.Update()
-	bp := game.b.body.Position()
-	s.direction.SetPosition(bp)
 
+	// update camera and HUD
+	bp := game.b.body.Position()
+	s.direction.SetPosition(bp) // HUD arrow pointer
 	game.cam.Position = [2]float64{bp.X, bp.Y}
 	return nil
 }

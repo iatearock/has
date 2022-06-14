@@ -2,6 +2,7 @@ package main
 
 import (
 	"image/color"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text"
@@ -12,18 +13,30 @@ type SceneGame struct {
 	sceneManager *SceneManager
 	direction    *ui.Direction
 	inputHandler *InputHandler
+	eventQueue   *ControlEvent
+
+	timeStart  time.Time
+	waveShader *ebiten.Shader
 }
 
 func NewSceneGame(sm *SceneManager) *SceneGame {
 	s := &SceneGame{sceneManager: sm}
 	dirImg, _ := vfs.GetImage("assets/images/direction.png")
 	s.direction = ui.NewDirection(dirImg, 600, 40, game.end.body.Position())
-	// game.audioManager.audioPlayer.Play()
+
+	// audio
 	wave, _ := game.audioManager.NewInfiniteLoop("wave", "assets/audio/632517__thedutchmancreative__waves.ogg")
 	seagull, _ := game.audioManager.NewPlayer("seagull", "assets/audio/510917__lydmakeren__seagulls-short.ogg")
 	wave.Play()
 	seagull.Play()
-	s.inputHandler = NewDefaultInputHandler(game.b)
+
+	// user inpu
+	s.eventQueue = NewDefualtControlEvent(game.b)
+	s.inputHandler = NewDefaultInputHandler(s.eventQueue.commands)
+
+	s.timeStart = time.Now()
+	shaderFile, _ := vfs.ReadFile("assets/shaders/wave.kage")
+	s.waveShader, _ = ebiten.NewShader(shaderFile)
 	return s
 }
 
@@ -47,6 +60,8 @@ func (s *SceneGame) Update() error {
 
 func (s *SceneGame) Draw(screen *ebiten.Image) {
 	screen.Fill(color.RGBA{128, 170, 187, 255})
+	waveShader(screen, s.waveShader,
+		float32(time.Since(s.timeStart).Milliseconds()))
 
 	game.cam.Update()
 	text.Draw(screen, "Press q to return to Title Screen", font24, 50, screenHeight/8*7, color.White)
@@ -64,4 +79,14 @@ func (s *SceneGame) DrawInfo(screen *ebiten.Image) {
 	if game.b.inStore {
 		text.Draw(screen, "Shop", font24, 500, 40, color.White)
 	}
+}
+
+func waveShader(image *ebiten.Image, s *ebiten.Shader, t float32) {
+	sop := &ebiten.DrawRectShaderOptions{}
+	sop.Uniforms = map[string]interface{}{
+		"Pi":   float32(3.14159265359),
+		"Time": t, // milliseconds
+		// "Cursor": []float32{float32(mx), float32(my)},
+	}
+	image.DrawRectShader(screenWidth, screenHeight, s, sop)
 }

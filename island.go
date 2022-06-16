@@ -11,8 +11,9 @@ type Island struct {
 	img    *ebiten.Image
 	radius float64
 
-	body  *cp.Body
-	shape *cp.Shape
+	body   *cp.Body
+	shape  *cp.Shape // collision
+	sensor *cp.Shape // is boat in range to dock
 
 	store []*Item
 	// offer []int // offer/ask price for store item
@@ -21,7 +22,7 @@ type Island struct {
 
 // Create new circular island at x, y with radius r
 func NewIsland(x, y, r float64) *Island {
-	img, err := vfs.GetImage("assets/images/circle100.png")
+	img, err := vfs.GetImage("assets/images/island.png")
 
 	if err != nil {
 		log.Println(err)
@@ -29,9 +30,10 @@ func NewIsland(x, y, r float64) *Island {
 	i := &Island{img: img, radius: r, store: []*Item{}}
 	i.body = space.AddBody(cp.NewStaticBody())
 	i.body.SetPosition(cp.Vector{X: x, Y: y})
+	i.sensor = space.AddShape(cp.NewCircle(i.body, r+20, cp.Vector{}))
+	i.sensor.SetSensor(true)
+	i.sensor.SetCollisionType(COLLISION_SENSOR)
 	i.shape = space.AddShape(cp.NewCircle(i.body, r, cp.Vector{}))
-	i.shape.SetSensor(true)
-	i.shape.SetCollisionType(COLLISION_SENSOR)
 
 	i.body.UserData = i
 	return i

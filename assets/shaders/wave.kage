@@ -1,6 +1,7 @@
 package main
 var Time float
 var Pi float
+var Camera vec2
 // var Cursor vec2
 
 
@@ -9,7 +10,8 @@ var Pi float
 // theta - angle of the wave
 func wave(pos vec4, w float, amp float, theta float) vec4 {
 
-	pt := pos/640.0  // texel coord
+	// cam := float(mod(Camera, 640)) / 640.0
+	pt := pos.xy/640.0 + Camera/640.0  // texel coord
 
 	var ptt vec2 // rotate by theta
 	ptt.x = pt.x *cos(theta) - pt.y * sin(theta)
@@ -18,7 +20,7 @@ func wave(pos vec4, w float, amp float, theta float) vec4 {
 	n := 640.0 / w
 	vel := 1.249 * sqrt(w) / 15.24  
 	// 14.24 is abritary, 1.249 is based on deep ocean wave physics
-	ptt = ptt + Time / 10000 * vel
+	ptt = ptt + Time / 30000 * vel
 
 	k := 2 * Pi * n  // wavelength
 	fx := k * ptt.x
@@ -28,14 +30,9 @@ func wave(pos vec4, w float, amp float, theta float) vec4 {
 	fourierZ := 0.1 + 4.0*amp/pow(Pi, 2)*cos(fx) + amp/pow(Pi,2)*cos(2*fx) + 
 	 0.1 + 4.0*amp/pow(Pi, 2)*sin(fy) + amp/pow(Pi,2)*sin(2*fy)
 	
-	// gradient at x
-	// grad := normalize(vec3(1.0, 0.0, k * amplitude * cos(f)  ))
-	// normal := cross(vec3(0.0,1.0,0.0), grad)
+	fourierY := fourierZ * 0.05
 
-	// if fourierZ < 0.15 {
-	// 	fourierZ = 0.0
-	// }
-	waveX := vec4(0, 0.0, fourierZ ,0.0)
+	waveX := vec4(0, fourierY, fourierZ ,0.0)
 	return waveX
 
 }
@@ -53,9 +50,13 @@ func Fragment(pos vec4, texel vec2, color vec4) vec4 {
 		wave(pos, 200, 0.2, 7.*Pi/8.) + 
 		wave(pos, 100, 0.2, Pi/8.)// +
 
-	if c.z < 1.0 {
-		c.z = 0
+	if c.z < 0.9 {
+		c.z *= 0.2
+		c.y *= 0.2
+	} else if c.z >= 0.9 {
+		c.z *= 0.5
+		c.y *= 0.5
 	}
-	c = oceanBlue + c
+	c = oceanBlue + c 
 	return c
 }

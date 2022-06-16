@@ -32,7 +32,7 @@ var (
 type Game struct {
 	cam          *Camera
 	audioManager *AudioManager
-	b            *Boat
+	b            *Boat // player
 	island       *Island
 	start        *Island
 	end          *Island
@@ -42,7 +42,7 @@ type Game struct {
 }
 
 func NewGame() *Game {
-	g := &Game{b: NewBoat(20, 200), windVel: cp.Vector{X: 1, Y: 0},
+	g := &Game{b: NewBoat(20, 100), windVel: cp.Vector{X: 1, Y: 0},
 		island: NewIsland(300, 300, 50),
 		start:  NewIsland(20, 200, 50), end: NewIsland(600, 200, 50),
 		wake:         NewWake(),
@@ -51,7 +51,7 @@ func NewGame() *Game {
 	g.cam = &Camera{}
 	g.cam.Reset()
 	g.cam.ViewPort = [2]float64{screenWidth, screenHeight}
-	g.cam.Position = [2]float64{20, 200}
+	g.cam.Position = [2]float64{20, 100}
 	// var err error
 	// g.audioManager, err = NewAudioPlayer(audio.NewContext(44100)) // sample rate
 	g.audioManager = NewAudioManager()

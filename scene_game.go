@@ -61,17 +61,18 @@ func (s *SceneGame) Update() error {
 func (s *SceneGame) Draw(screen *ebiten.Image) {
 	screen.Fill(color.RGBA{128, 170, 187, 255})
 	waveShader(screen, s.waveShader,
-		float32(time.Since(s.timeStart).Milliseconds()))
+		float32(time.Since(s.timeStart).Milliseconds()),
+		float32(game.cam.Position[0]), float32(game.cam.Position[1]))
 
 	game.cam.Update()
-	text.Draw(screen, "Press q to return to Title Screen", font24, 50, screenHeight/8*7, color.White)
-	game.island.Draw(screen)
 	game.start.Draw(screen)
 	game.end.Draw(screen)
 	game.wake.Draw(screen)
+	game.island.Draw(screen)
 	game.b.Draw(screen)
 
 	s.direction.Draw(screen)
+	text.Draw(screen, "Press q to return to Title Screen", font24, 50, screenHeight/8*7, color.White)
 	s.DrawInfo(screen)
 }
 
@@ -81,11 +82,12 @@ func (s *SceneGame) DrawInfo(screen *ebiten.Image) {
 	}
 }
 
-func waveShader(image *ebiten.Image, s *ebiten.Shader, t float32) {
+func waveShader(image *ebiten.Image, s *ebiten.Shader, t float32, cx, cy float32) {
 	sop := &ebiten.DrawRectShaderOptions{}
 	sop.Uniforms = map[string]interface{}{
-		"Pi":   float32(3.14159265359),
-		"Time": t, // milliseconds
+		"Pi":     float32(3.14159265359),
+		"Time":   t, // milliseconds,
+		"Camera": []float32{cx, cy},
 		// "Cursor": []float32{float32(mx), float32(my)},
 	}
 	image.DrawRectShader(screenWidth, screenHeight, s, sop)

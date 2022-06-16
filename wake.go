@@ -20,7 +20,7 @@ type Bubble struct {
 // NewBubble at pos, with initial size and boat velocity
 func NewBubble(pos cp.Vector, size, vel float64) *Bubble {
 	lt := 5.0
-	initAlpha := 127.0
+	initAlpha := 50.0 //127.0
 	return &Bubble{pos: pos, size: size, grow: vel * 0.5,
 		lifetime: lt, age: 0, alpha: initAlpha, fade: initAlpha / lt}
 }
@@ -43,7 +43,8 @@ func (b *Bubble) Draw(screen, bb *ebiten.Image) {
 	op.GeoM.Scale(sx, sx)
 	op.GeoM.Translate(b.pos.X, b.pos.Y)
 	op.GeoM = game.cam.Concat(op.GeoM)
-	op.ColorM.Scale(1, 1, 1, b.alpha/127.0)
+	op.ColorM.Scale(1, 0.9, 0.9, b.alpha/127.0)
+	// op.CompositeMode = ebiten.CompositeModeSourceOut
 	screen.DrawImage(bb, op)
 }
 

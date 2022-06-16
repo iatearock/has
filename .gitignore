@@ -2,6 +2,7 @@
 build/
 bin/
 main
+has
 *.out
 *.png
 *.ttf

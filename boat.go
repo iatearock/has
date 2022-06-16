@@ -118,7 +118,7 @@ func (b *Boat) Update() error {
 	if b.bubbleCount%30 == 0 {
 		off := rand.Float64()*20.0 - 10.0
 		yOffset := vecY.Normalize().Mult(off)
-		game.wake.AddBubble(b.body.Position().Add(yOffset), 10, b.body.Velocity().Length())
+		game.wake.AddBubble(b.body.Position().Add(yOffset), 5, b.body.Velocity().Length())
 	}
 
 	return nil

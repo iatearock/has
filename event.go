@@ -10,10 +10,11 @@ type ControlEvent struct {
 func NewDefualtControlEvent(b *Boat) *ControlEvent {
 	r := &ControlEvent{
 		exec: map[string]func(){
-			"up":    commandUp(b),
-			"down":  commandDown(b),
-			"left":  commandLeft(b),
-			"right": commandRight(b),
+			"up":     commandUp(b),
+			"down":   commandDown(b),
+			"left":   commandLeft(b),
+			"right":  commandRight(b),
+			"anchor": commandAnchor(b),
 		},
 		commands: make(chan string),
 	}
@@ -36,6 +37,9 @@ func (r *ControlEvent) processEvents() {
 		if message == "right" {
 			r.exec["right"]()
 		}
+		if message == "anchor" {
+			r.exec["anchor"]()
+		}
 	}
 }
 
@@ -57,5 +61,14 @@ func commandLeft(b *Boat) func() {
 func commandRight(b *Boat) func() {
 	return func() {
 		b.body.ApplyForceAtLocalPoint(cp.Vector{X: 0, Y: -50}, cp.Vector{X: -20, Y: 0})
+	}
+}
+func commandAnchor(b *Boat) func() {
+	return func() {
+		if b.isAnchor {
+			b.UpAnchor()
+		} else {
+			b.Anchor()
+		}
 	}
 }

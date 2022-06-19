@@ -22,8 +22,11 @@ type Boat struct {
 	imageWr, imageHr int // rudder image width/height
 	imageWs, imageHs int // sail image width/height
 
-	body  *cp.Body
-	shape *cp.Shape
+	body   *cp.Body
+	shape  *cp.Shape
+	anchor *cp.Constraint
+
+	isAnchor bool
 
 	inStore   bool // is boat in store
 	store     []*Item
@@ -63,6 +66,8 @@ func NewBoat(x, y float64) *Boat {
 	b.shape.SetCollisionType(COLLISION_BOAT)
 	b.body.UserData = b
 
+	b.isAnchor = false
+
 	return b
 }
 
@@ -95,6 +100,7 @@ func (b *Boat) Draw(screen *ebiten.Image) {
 	screen.DrawImage(b.sail, op)
 
 	// text.Draw(screen, fmt.Sprintf("Sail %d%% Up", int(b.sailUp*100)), font24, 10, 40, color.White)
+	// text.Draw(screen, fmt.Sprintf("vel %v", b.body.Velocity()), font24, 40, 40, color.White)
 }
 
 func (b *Boat) Update() error {
@@ -173,8 +179,12 @@ func (b *Boat) ControlRow() {
 
 // RemovePhysics body and shape before deleting the boat
 func (b *Boat) RemovePhysics() {
+	if b.isAnchor {
+		b.UpAnchor()
+	}
 	space.RemoveShape(b.shape)
 	space.RemoveBody(b.body)
+
 }
 
 func (b *Boat) String() string {
@@ -187,4 +197,20 @@ func (b *Boat) EnterStore() {
 
 func (b *Boat) ExitStore() {
 	b.inStore = false
+}
+
+// Dock add
+func (b *Boat) Anchor() {
+	if b.body.Velocity().Length() < 10 {
+		b.anchor = cp.NewDampedSpring(b.body, space.StaticBody,
+			cp.Vector{X: 0, Y: 0}, b.body.Position(), 0, 100, 0.8)
+		space.AddConstraint(b.anchor)
+		b.isAnchor = true
+	} // TODO else send too fast warning message
+}
+
+func (b *Boat) UpAnchor() {
+	space.RemoveConstraint(b.anchor)
+	b.anchor = nil
+	b.isAnchor = false
 }

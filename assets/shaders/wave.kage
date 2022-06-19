@@ -54,8 +54,8 @@ func Fragment(pos vec4, texel vec2, color vec4) vec4 {
 		c.z *= 0.2
 		c.y *= 0.2
 	} else if c.z >= 0.9 {
-		c.z *= 0.5
-		c.y *= 0.5
+		c.z *= 0.6
+		c.y *= 0.6
 	}
 	c = oceanBlue + c 
 	return c

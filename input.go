@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 type InputHandler struct {
@@ -17,10 +18,11 @@ func NewInputHandler(eq chan string) *InputHandler {
 
 func NewDefaultInputHandler(eq chan string) *InputHandler {
 	ih := &InputHandler{keys: map[string]ebiten.Key{
-		"up":    ebiten.KeyUp,
-		"down":  ebiten.KeyDown,
-		"left":  ebiten.KeyLeft,
-		"right": ebiten.KeyRight,
+		"up":     ebiten.KeyUp,
+		"down":   ebiten.KeyDown,
+		"left":   ebiten.KeyLeft,
+		"right":  ebiten.KeyRight,
+		"anchor": ebiten.KeyD,
 	},
 		eventQueue: eq,
 	}
@@ -40,6 +42,9 @@ func (ih *InputHandler) Update() error {
 	}
 	if ebiten.IsKeyPressed(ih.keys["right"]) {
 		ih.eventQueue <- "right"
+	}
+	if inpututil.IsKeyJustPressed(ih.keys["anchor"]) {
+		ih.eventQueue <- "anchor"
 	}
 	return nil
 }

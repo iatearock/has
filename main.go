@@ -25,8 +25,8 @@ var (
 	vfs          *dango.FS
 	sceneManager *SceneManager
 	font24       font.Face
-	game         *Game // global game state
-	space        *cp.Space
+	game         *Game     // global game state
+	space        *cp.Space // global physics states
 )
 
 type Game struct {

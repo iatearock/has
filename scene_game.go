@@ -2,9 +2,11 @@ package main
 
 import (
 	"image/color"
+	"math/rand"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/text"
 	"iatearock.com/has/ui"
@@ -19,6 +21,9 @@ type SceneGame struct {
 
 	timeStart  time.Time
 	waveShader *ebiten.Shader
+
+	wave    *audio.Player // audio
+	seagull *audio.Player
 }
 
 func NewSceneGame(sm *SceneManager) *SceneGame {
@@ -29,10 +34,11 @@ func NewSceneGame(sm *SceneManager) *SceneGame {
 	s.anchor = ui.NewAnchor(anchorImg, 570, 40)
 
 	// audio
-	wave, _ := game.audioManager.NewInfiniteLoop("wave", "assets/audio/632517__thedutchmancreative__waves.ogg")
-	seagull, _ := game.audioManager.NewPlayer("seagull", "assets/audio/510917__lydmakeren__seagulls-short.ogg")
-	wave.Play()
-	seagull.Play()
+	s.wave, _ = game.audioManager.NewInfiniteLoop("wave", "assets/audio/632517__thedutchmancreative__waves.ogg")
+	s.seagull, _ = game.audioManager.NewPlayer("seagull", "assets/audio/510917__lydmakeren__seagulls-short.ogg")
+	s.wave.Play()
+	s.seagull.SetVolume(0.6)
+	s.seagull.Play()
 
 	// user inpu
 	s.eventQueue = NewDefualtControlEvent(game.b)
@@ -54,6 +60,16 @@ func (s *SceneGame) Update() error {
 		game.audioManager.CloseAll()
 	}
 	game.wake.Update()
+
+	// audio
+	if !s.seagull.IsPlaying() {
+		// if seagull not playing, then randomly start playing
+		if rand.Float64() < 0.0011111 {
+			// approx play once in 15 seconds, assuming 60fps
+			s.seagull.Rewind()
+			s.seagull.Play()
+		}
+	}
 
 	// update camera and HUD
 	bp := game.b.body.Position()
@@ -81,7 +97,7 @@ func (s *SceneGame) Draw(screen *ebiten.Image) {
 
 	// text.Draw(screen, "Press q to return to Title Screen", font24, 50, screenHeight/8*7, color.White)
 	ebitenutil.DebugPrintAt(screen, "Press q to return to Title Screen", 10, 40)
-	ebitenutil.DebugPrintAt(screen, "Press d to anchor", 10, 55)
+	ebitenutil.DebugPrintAt(screen, "Press d to anchor/dock", 10, 55)
 
 	s.DrawInfo(screen)
 }

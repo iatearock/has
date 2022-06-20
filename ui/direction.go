@@ -11,8 +11,8 @@ type Direction struct {
 	target  cp.Vector
 	current cp.Vector
 
-	display bool // do not display when target is on screen
-	sx      float64
+	display bool    // do not display when target is on screen
+	sx      float64 // display position on screen
 	sy      float64
 	op      *ebiten.DrawImageOptions
 }

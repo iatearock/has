@@ -56,7 +56,7 @@ func (s *SceneGame) Update() error {
 	space.Step(1.0 / 60.0)
 
 	if ebiten.IsKeyPressed(ebiten.KeyQ) {
-		s.sceneManager.GoTo(&SceneTitle{s.sceneManager})
+		s.sceneManager.GoTo(NewSceneTitle(s.sceneManager))
 		game.audioManager.CloseAll()
 	}
 	game.wake.Update()

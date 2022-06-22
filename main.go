@@ -88,7 +88,7 @@ func main() {
 
 	log.Println("HAS starting...")
 	sceneManager = NewSceneManager(screenWidth, screenHeight)
-	sceneManager.GoTo(&SceneTitle{sceneManager})
+	sceneManager.GoTo(NewSceneTitle(sceneManager))
 
 	ebiten.SetWindowSize(screenWidth, screenHeight)
 	ebiten.SetWindowTitle("HAS")

@@ -33,9 +33,7 @@ type Game struct {
 	cam          *Camera
 	audioManager *AudioManager
 	b            *Boat // player
-	island       *Island
-	start        *Island
-	end          *Island
+	island       []*Island
 	windVel      cp.Vector // radian
 	wake         *Wake
 	boatOnIsland map[*Boat]*Island
@@ -43,8 +41,9 @@ type Game struct {
 
 func NewGame() *Game {
 	g := &Game{b: NewBoat(20, 100), windVel: cp.Vector{X: 1, Y: 0},
-		island: NewIsland(300, 300, 50),
-		start:  NewIsland(20, 200, 50), end: NewIsland(600, 200, 50),
+		island: []*Island{NewIsland(300, 300, 50),
+			NewIsland(20, 200, 50),
+			NewIsland(600, 200, 50)},
 		wake:         NewWake(),
 		boatOnIsland: map[*Boat]*Island{},
 	}

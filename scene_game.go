@@ -29,7 +29,8 @@ type SceneGame struct {
 func NewSceneGame(sm *SceneManager) *SceneGame {
 	s := &SceneGame{sceneManager: sm}
 	dirImg, _ := vfs.GetImage("assets/images/direction.png")
-	s.direction = ui.NewDirection(dirImg, 600, 40, game.end.body.Position())
+	endPos := game.island[len(game.island)-1].body.Position()
+	s.direction = ui.NewDirection(dirImg, 600, 40, endPos)
 	anchorImg, _ := vfs.GetImage("assets/images/anchor.png")
 	s.anchor = ui.NewAnchor(anchorImg, 570, 40)
 
@@ -86,16 +87,16 @@ func (s *SceneGame) Draw(screen *ebiten.Image) {
 		float32(game.cam.Position[0]), float32(game.cam.Position[1]))
 
 	game.cam.Update()
-	game.start.Draw(screen)
-	game.end.Draw(screen)
+	for _, is := range game.island {
+		is.Draw(screen)
+	}
 	game.wake.Draw(screen)
-	game.island.Draw(screen)
 	game.b.Draw(screen)
 
 	s.direction.Draw(screen)
 	s.anchor.Draw(screen)
 
-	// text.Draw(screen, "Press q to return to Title Screen", font24, 50, screenHeight/8*7, color.White)
+	text.Draw(screen, "Press q to return to Title Screen", font24, 50, screenHeight/8*7, color.White)
 	ebitenutil.DebugPrintAt(screen, "Press q to return to Title Screen", 10, 40)
 	ebitenutil.DebugPrintAt(screen, "Press d to anchor/dock", 10, 55)
 
@@ -104,7 +105,7 @@ func (s *SceneGame) Draw(screen *ebiten.Image) {
 
 func (s *SceneGame) DrawInfo(screen *ebiten.Image) {
 	if game.b.inStore {
-		text.Draw(screen, "Shop", font24, 500, 40, color.White)
+		text.Draw(screen, "Press D to dock/undock", font24, 300, 40, color.White)
 	}
 }
 

@@ -56,6 +56,7 @@ func (i *Island) Draw(screen *ebiten.Image) {
 // RemovePhysics body and shape before deleting the island
 func (i *Island) RemovePhysics() {
 	space.RemoveShape(i.shape)
+	space.RemoveShape(i.sensor)
 	space.RemoveBody(i.body)
 }
 

@@ -13,7 +13,7 @@ import (
 
 // Camera projects world to Screen
 type Camera struct {
-	ViewPort   f64.Vec2 // viewport should be the same as the window size
+	ViewPort   f64.Vec2 // viewport should be the same as the window size/resolution
 	Position   f64.Vec2 // points camera to `Position` in the world
 	ZoomFactor int
 	Rotation   float64
@@ -85,7 +85,7 @@ func (c *Camera) Render(screen, world *ebiten.Image) {
 }
 
 func (c *Camera) ScreenToWorld(posX, posY int) (float64, float64) {
-	inverseMatrix := c.worldMatrix()
+	inverseMatrix := c.matrix
 	if inverseMatrix.IsInvertible() {
 		inverseMatrix.Invert()
 		return inverseMatrix.Apply(float64(posX), float64(posY))
@@ -93,6 +93,11 @@ func (c *Camera) ScreenToWorld(posX, posY int) (float64, float64) {
 		// When scaling it can happend that matrix is not invertable
 		return math.NaN(), math.NaN()
 	}
+}
+
+func (c *Camera) WorldToScreen(wx, wy float64) (int, int) {
+	sx, sy := c.matrix.Apply(wx, wy)
+	return int(sx), int(sy)
 }
 
 // IsPointInViewport check is a point in on screen

@@ -9,6 +9,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/text"
+	"github.com/jakecoffman/cp"
 	"iatearock.com/has/ui"
 )
 
@@ -21,6 +22,8 @@ type SceneGame struct {
 
 	timeStart  time.Time
 	waveShader *ebiten.Shader
+
+	startMessage *ui.Message
 
 	wave    *audio.Player // audio
 	seagull *audio.Player
@@ -38,7 +41,7 @@ func NewSceneGame(sm *SceneManager) *SceneGame {
 	s.wave, _ = game.audioManager.NewInfiniteLoop("wave", "assets/audio/632517__thedutchmancreative__waves.ogg")
 	s.seagull, _ = game.audioManager.NewPlayer("seagull", "assets/audio/510917__lydmakeren__seagulls-short.ogg")
 	s.wave.Play()
-	s.seagull.SetVolume(0.6)
+	s.seagull.SetVolume(0.2)
 	s.seagull.Play()
 
 	// user inpu
@@ -48,6 +51,9 @@ func NewSceneGame(sm *SceneManager) *SceneGame {
 	s.timeStart = time.Now()
 	shaderFile, _ := vfs.ReadFile("assets/shaders/wave.kage")
 	s.waveShader, _ = ebiten.NewShader(shaderFile)
+
+	s.startMessage = ui.NewMessage("The commodore is after you.\nGo East. Your first mate is waiting for you.",
+		cp.Vector{X: -250, Y: 50})
 	return s
 }
 
@@ -95,6 +101,8 @@ func (s *SceneGame) Draw(screen *ebiten.Image) {
 
 	s.direction.Draw(screen)
 	s.anchor.Draw(screen)
+
+	s.startMessage.Draw(screen, font24, game.cam.matrix)
 
 	text.Draw(screen, "Press q to return to Title Screen", font24, 50, screenHeight/8*7, color.White)
 	ebitenutil.DebugPrintAt(screen, "Press q to return to Title Screen", 10, 40)

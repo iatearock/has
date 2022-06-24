@@ -45,12 +45,12 @@ func (r *ControlEvent) processEvents() {
 
 func commandUp(b *Boat) func() {
 	return func() {
-		b.body.ApplyForceAtLocalPoint(cp.Vector{X: 100, Y: 0}, cp.Vector{})
+		b.body.ApplyForceAtLocalPoint(cp.Vector{X: 200, Y: 0}, cp.Vector{})
 	}
 }
 func commandDown(b *Boat) func() {
 	return func() {
-		b.body.ApplyForceAtLocalPoint(cp.Vector{X: -100, Y: 0}, cp.Vector{})
+		b.body.ApplyForceAtLocalPoint(cp.Vector{X: -200, Y: 0}, cp.Vector{})
 	}
 }
 func commandLeft(b *Boat) func() {

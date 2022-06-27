@@ -11,13 +11,14 @@ import (
 
 // Message that are located in the world coordinate, i.e. move with other world fixtures
 type Message struct {
-	pos cp.Vector // world position
-	msg string
-	op  *ebiten.DrawImageOptions
+	pos     cp.Vector // world position
+	msg     string
+	op      *ebiten.DrawImageOptions
+	display bool
 }
 
 func NewMessage(text string, pos cp.Vector) *Message {
-	m := &Message{pos: pos, msg: text}
+	m := &Message{pos: pos, msg: text, display: true}
 	m.op = &ebiten.DrawImageOptions{}
 	m.op.GeoM.Translate(pos.X, pos.Y)
 	return m
@@ -29,6 +30,10 @@ func (m *Message) UpdateText(text string) {
 
 func (m *Message) UpdatePosition(pos cp.Vector) {
 	m.pos = pos
+}
+
+func (m *Message) SetDisplay(b bool) {
+	m.display = b
 }
 
 func (m *Message) Draw(screen *ebiten.Image, fontface font.Face, geom ebiten.GeoM) {

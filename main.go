@@ -41,9 +41,9 @@ type Game struct {
 
 func NewGame() *Game {
 	g := &Game{b: NewBoat(20, 100), windVel: cp.Vector{X: 1, Y: 0},
-		island: []*Island{NewIsland(300, 300, 50),
-			NewIsland(20, 200, 50),
-			NewIsland(600, 200, 50)},
+		island: []*Island{NewIsland(300, 300, 50, false),
+			NewIsland(20, 200, 50, false),
+			NewIsland(600, 200, 50, true)},
 		wake:         NewWake(),
 		boatOnIsland: map[*Boat]*Island{},
 	}

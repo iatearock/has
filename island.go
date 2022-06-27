@@ -8,8 +8,9 @@ import (
 )
 
 type Island struct {
-	img    *ebiten.Image
-	radius float64
+	img     *ebiten.Image
+	overlay *ebiten.Image
+	radius  float64
 
 	body   *cp.Body
 	shape  *cp.Shape // collision
@@ -18,16 +19,23 @@ type Island struct {
 	store []*Item
 	// offer []int // offer/ask price for store item
 	// ask   []int
+
+	end bool // finish island for this level
 }
 
 // Create new circular island at x, y with radius r
-func NewIsland(x, y, r float64) *Island {
+func NewIsland(x, y, r float64, end bool) *Island {
 	img, err := vfs.GetImage("assets/images/island.png")
 
 	if err != nil {
 		log.Println(err)
 	}
-	i := &Island{img: img, radius: r, store: []*Item{}}
+	imgOverlay, err := vfs.GetImage("assets/images/treasure.png")
+
+	if err != nil {
+		log.Println(err)
+	}
+	i := &Island{img: img, overlay: imgOverlay, radius: r, store: []*Item{}, end: end}
 	i.body = space.AddBody(cp.NewStaticBody())
 	i.body.SetPosition(cp.Vector{X: x, Y: y})
 	i.sensor = space.AddShape(cp.NewCircle(i.body, r+20, cp.Vector{}))
@@ -51,6 +59,9 @@ func (i *Island) Draw(screen *ebiten.Image) {
 	op.GeoM.Translate(pos.X, pos.Y)
 	op.GeoM = game.cam.Concat(op.GeoM)
 	screen.DrawImage(i.img, op)
+	if i.end {
+		screen.DrawImage(i.overlay, op)
+	}
 }
 
 // RemovePhysics body and shape before deleting the island

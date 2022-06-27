@@ -21,12 +21,16 @@ type SceneGame struct {
 	eventQueue   *ControlEvent
 
 	timeStart  time.Time
+	timeSince  time.Duration
 	waveShader *ebiten.Shader
 
 	startMessage *ui.Message
+	endMessage   *ui.Message
 
 	wave    *audio.Player // audio
 	seagull *audio.Player
+
+	sceneEnd bool
 }
 
 func NewSceneGame(sm *SceneManager) *SceneGame {
@@ -52,31 +56,44 @@ func NewSceneGame(sm *SceneManager) *SceneGame {
 	shaderFile, _ := vfs.ReadFile("assets/shaders/wave.kage")
 	s.waveShader, _ = ebiten.NewShader(shaderFile)
 
-	s.startMessage = ui.NewMessage("The commodore is after you.\nGo East. Your first mate is waiting for you.",
-		cp.Vector{X: -250, Y: 50})
+	s.startMessage = ui.NewMessage("The commodore is after you.\nFollow the compass to the safe house.",
+		cp.Vector{X: -250, Y: 30})
+	s.endMessage = ui.NewMessage("Welcom home! Mission Completed.\n Press q to quit game.",
+		cp.Vector{X: 450, Y: 200})
+	s.endMessage.SetDisplay(false)
+
+	s.sceneEnd = false
 	return s
 }
 
 func (s *SceneGame) Update() error {
-	s.inputHandler.Update()
-	game.b.Update()
-	space.Step(1.0 / 60.0)
+	if !s.sceneEnd {
+		s.inputHandler.Update()
+		game.b.Update()
+		space.Step(1.0 / 60.0)
+
+		game.wake.Update()
+
+		// audio
+		if !s.seagull.IsPlaying() {
+			// if seagull not playing, then randomly start playing
+			if rand.Float64() < 0.0011111 {
+				// approx play once in 15 seconds, assuming 60fps
+				s.seagull.Rewind()
+				s.seagull.Play()
+			}
+		}
+
+		s.timeSince = time.Since(s.timeStart)
+		s.sceneEnd = s.IsFinished()
+	}
 
 	if ebiten.IsKeyPressed(ebiten.KeyQ) {
 		s.sceneManager.GoTo(NewSceneTitle(s.sceneManager))
 		game.audioManager.CloseAll()
 	}
-	game.wake.Update()
 
-	// audio
-	if !s.seagull.IsPlaying() {
-		// if seagull not playing, then randomly start playing
-		if rand.Float64() < 0.0011111 {
-			// approx play once in 15 seconds, assuming 60fps
-			s.seagull.Rewind()
-			s.seagull.Play()
-		}
-	}
+	//
 
 	// update camera and HUD
 	bp := game.b.body.Position()
@@ -89,7 +106,7 @@ func (s *SceneGame) Update() error {
 func (s *SceneGame) Draw(screen *ebiten.Image) {
 	screen.Fill(color.RGBA{128, 170, 187, 255})
 	waveShader(screen, s.waveShader,
-		float32(time.Since(s.timeStart).Milliseconds()),
+		float32(s.timeSince.Milliseconds()),
 		float32(game.cam.Position[0]), float32(game.cam.Position[1]))
 
 	game.cam.Update()
@@ -99,12 +116,16 @@ func (s *SceneGame) Draw(screen *ebiten.Image) {
 	game.wake.Draw(screen)
 	game.b.Draw(screen)
 
+	// HUD
 	s.direction.Draw(screen)
 	s.anchor.Draw(screen)
 
 	s.startMessage.Draw(screen, font24, game.cam.matrix)
+	if s.sceneEnd {
+		s.endMessage.Draw(screen, font24, game.cam.matrix)
+	}
 
-	text.Draw(screen, "Press q to return to Title Screen", font24, 50, screenHeight/8*7, color.White)
+	// text.Draw(screen, "Press q to return to Title Screen", font24, 50, screenHeight/8*7, color.White)
 	ebitenutil.DebugPrintAt(screen, "Press q to return to Title Screen", 10, 40)
 	ebitenutil.DebugPrintAt(screen, "Press d to anchor/dock", 10, 55)
 
@@ -115,6 +136,19 @@ func (s *SceneGame) DrawInfo(screen *ebiten.Image) {
 	if game.b.inStore {
 		text.Draw(screen, "Press D to dock/undock", font24, 300, 40, color.White)
 	}
+}
+
+func (s *SceneGame) IsFinished() bool {
+	// boat at finish island
+	if island, ok := game.boatOnIsland[game.b]; ok {
+		if island.end {
+			// boat at finishing island
+			if game.b.inStore && game.b.isAnchor {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func waveShader(image *ebiten.Image, s *ebiten.Shader, t float32, cx, cy float32) {
